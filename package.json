@@ -1,0 +1,26 @@
+{
+  "name": "cte",
+  "version": "0.0.0",
+  "description": "Category Theory Environment on javascript prototype definition",
+  "main": "cte.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnny-shaman/Category_Theory_Environment.git"
+  },
+  "keywords": [
+    "Category Theory",
+    "define",
+    "prototype",
+    "algebra",
+    "algebraic"
+  ],
+  "author": "Noboru Okazaki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnny-shaman/Category_Theory_Environment/issues"
+  },
+  "homepage": "https://github.com/johnny-shaman/Category_Theory_Environment#readme"
+}
