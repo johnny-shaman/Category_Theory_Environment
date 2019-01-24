@@ -1,6 +1,6 @@
 {
   "name": "cte",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Category Theory Environment on javascript prototype definition",
   "main": "cte.js",
   "scripts": {
@@ -12,8 +12,16 @@
   },
   "keywords": [
     "Category Theory",
-    "algebra",
-    "algebraic"
+    "No Constructive",
+    "No let",
+    "No variable",
+    "No const",
+    "functor",
+    "Applicative",
+    "Monad",
+    "Algebra",
+    "Algebraic",
+    "CoAlgebra",
   ],
   "author": "Noboru Okazaki",
   "license": "MIT",
