@@ -21,7 +21,7 @@
     "Monad",
     "Algebra",
     "Algebraic",
-    "CoAlgebra",
+    "CoAlgebra"
   ],
   "author": "Noboru Okazaki",
   "license": "MIT",
