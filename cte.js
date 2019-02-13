@@ -1,12 +1,18 @@
 (() => {
   "use strict";
 
-  let _ = function (v) {
+  let _ = function (v, f) {
     return Object.create(_.prototype, {
       "@": {
         configurable: true,
         get () {
           return v;
+        }
+      },
+      "#": {
+        configurable: true,
+        get () {
+          return f;
         }
       }
     });
@@ -15,7 +21,7 @@
     _: {
       configurable: true,
       get () {
-        return _.id(this["@"]);
+        return _.id_(this["@"]);
       }
     },
     lift: {
@@ -59,6 +65,16 @@
       value (c, y, n) {
         return this.ask(t => _.is_(t._) === c, y, n);
       } 
+    },
+    fullen: {
+      configurable: true,
+      value (y, n) {
+        return this.ask(
+          t => !(t.vals.includes(null) || t.vals.includes(undefined)),
+          y,
+          n
+        );
+      }
     },
     reduce: {
       configurable: true,
@@ -129,6 +145,12 @@
         return this.all.fold((p, [k, v]) => p.put({[v]: k}), this.other);
       }
     },
+    adapt: {
+      configurable: true,
+      value (...a) {
+        return this.map(v => v == null ? a.shift() : v);
+      }
+    },
     by: {
       configurable: true,
       get () {
@@ -161,10 +183,22 @@
         return this.endo(Object.assign, ...o);
       }
     },
+    descript: {
+      configurable: true,
+      get () {
+        return this.endo(Object.getOwnPropertyDescriptors);
+      }
+    },
     struct: {
       configurable: true,
       value (o) {
         return this.endo(Object.create, o);
+      }
+    },
+    define: {
+      configurable: true,
+      value (o) {
+        return this.endo(Object.defineProperties, o);
       }
     },
     make: {
@@ -182,7 +216,7 @@
     copy: {
       configurable: true,
       get () {
-        return this.lift(t => t.other.put(t._))._;
+        return this.lift(t => t.other.define(t.descript._));
       }
     },
     clone: {
@@ -198,89 +232,99 @@
           }), t.other))
         );
       }
-    }
-  });
-
-  _.to_ = (...f) => (...v) => f.reduceRight((a, m) => m(a))(...v);
-  _.id_ = v => v == null ? null : v.valueOf();
-  _.is_ = v => v == null ? null : v.constructor;
-  _._ = _.pair = function (R, L, K) {
-    return Object.create(_.pair.prototype, {
-      "@": {
-        configurable: true,
-        get () {
-          return {L, R};
-        }
-      },
-      "#": {
-        configurable: true,
-        get () {
-          return K;
-        }
-      }
-    });
-  };
-  _._.prototype = Object.create(_.prototype, {
-    constructor: {
-      configurable: true,
-      writable: true,
-      value: _.pair
     },
-    L: {
+    get: {
+      configurable: true,
+      value (...h) {
+        return this.lift(t => h.reduce((p, k) => p.endo(o => o[k]), t));
+      }
+    },
+    set: {
+      configurable: true,
+      value (v, ...h) {
+        return this.put(h.reduceRight((p, k) => ({[k]: p}), v));
+      }
+    },
+    delete: {
+      configurable: true,
+      value (...h) {
+        return this.take(t => _(h).each(k => t.flat(o => delete o[k])));
+      }
+    },
+    been: {
       configurable: true,
       get () {
-        return this._.L;
+        return new Proxy(this, {
+          get (t, k) {
+            switch (k) {
+              case "_": return this._;
+              case "to": return this;
+              default: return (...v) => t.take(
+                t => t.get(k).is(
+                  Function,
+                  ({_}) => _(...v),
+                  t => t.set(v.shift(), v)
+                )
+              ).been;
+            }
+          }
+        });
       }
     },
-    R: {
+    list: {
       configurable: true,
       get () {
-        return this._.R;
+        return this.ask(
+          t => t._.length == null,
+          t => t.copy.put({length: t.keys._.length}).list,
+          t => t.endo(Array.from)
+        );
       }
     },
-    K: {
+    json: {
       configurable: true,
       get () {
-        return this["#"];
-      }
-    },
-    update: {
-      configurable: true,
-      value (f = _.id_, ...v) {
-        return this.Lift(({L, R}) => _._(f(L(R), ...v), L));
-      }
-    },
-    final: {
-      configurable: true,
-      value (f = _.id_, ...v) {
-        return this.endo(({L, R}) => f(L(R)));
-      }
-    },
-    swap: {
-      configurable: true,
-      get () {
-        return this.bind(({R, L}) => _._(L, R));
+        return this.is(
+          String,
+          t => t.endo(JSON.parse),
+          t => t.endo(JSON.stringify)
+        );
       }
     },
     done: {
       configurable: true,
-      value (f = _.id_, ...v) {
-        return this.lift(
-          ({L, R, K}) => (
-            K == null
-            ? _(f(L(R))).flat(r => _._(r, L, r))
-            : _._(K, L, K)
-          )
+      value (...v) {
+        return this.ask(
+          t => t["#"] == null,
+          t => t.bind(f => _(f(...v), f)),
+          _.id_
         );
       }
     },
     redo: {
       configurable: true,
-      value (f = _.id_, ...v) {
-        return this.lift(({L, R}) => _(f(L(R))).flat(r => _.pair(r, L, r)));
+      value (...v) {
+        return this.ask(
+          t => t["#"] == null,
+          _.id_,
+          t => t["#"](...v)
+        );
       }
-    }
+    },
+    part: {
+      configurable: true,
+      value (...v) {
+        return _(v).fullen(
+          t => t.endo(f => f(...v)),
+          t => t.lift(t => (...vv) => t.part(..._(v).adapt(...vv)._))
+        );
+      }
+    },
   });
 
-  Object.assign(_.is_(this) === Object ? module.exports : this._, _);
+  _.to_ = (...f) => (...v) => f.reduceRight((a, m) => m(a))(...v);
+  _.id_ = v => v == null ? null : v.valueOf();
+  _.is_ = v => v == null ? null : v.constructor;
+
+  this.constructor === Object ? module.exports = _ : this._ = _;
 })();
