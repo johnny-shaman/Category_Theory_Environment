@@ -51,7 +51,7 @@
     take: {
       configurable: true,
       value (f, ...v) {
-        return this.lift(t => ({a: f(t, ...v), s: t}).s);
+        return this.lift(t => _(f(t, ...v), t)["#"]);
       }
     },
     ask: {
@@ -87,8 +87,8 @@
       value (f, ...v) {
         return this.is(
           Array,
-          ({_}) => _.reduce((p, c) => f(p, c, ...v)),
-          t => t._.reduce((p, [k, w]) => f(p, k, w, ...v))
+          ({_}) => _.reduce((p, c) => f(p, c, ...v), v.shift()),
+          t => t._.reduce((p, [k, w]) => f(p, k, w, ...v), v.shift())
         );
       }
     },
@@ -149,6 +149,30 @@
       configurable: true,
       value (...a) {
         return this.map(v => v == null ? a.shift() : v);
+      }
+    },
+    pushL: {
+      configurable: true,
+      value (...v) {
+        return this.take(t => t._.unshift(...v));
+      }
+    },
+    pushR: {
+      configurable: true,
+      value (...v) {
+        return this.take(t => t._.push(...v));
+      }
+    },
+    popL: {
+      configurable: true,
+      get () {
+        return this.endo(a => a.shift());
+      }
+    },
+    popR: {
+      configurable: true,
+      get () {
+        return this.endo(a => a.pop());
       }
     },
     by: {
@@ -319,12 +343,33 @@
           t => t.lift(t => (...vv) => t.part(..._(v).adapt(...vv)._))
         );
       }
-    },
+    }
   });
 
   _.to_ = (...f) => (...v) => f.reduceRight((a, m) => m(a))(...v);
   _.id_ = v => v == null ? null : v.valueOf();
   _.is_ = v => v == null ? null : v.constructor;
+
+  _(this).is(
+    Object,
+    t => t.lift().by.define({
+      on: {
+        configurable: true,
+        value (d) {
+          _(d).give(this["@"].on.bind(this["@"]));
+          return this;
+        }
+      },
+      once: {
+        configurable: true,
+        value (d) {
+          _(d).give(this["@"].once.bind(this["@"]));
+          return this;
+        }
+      }
+    }),
+    _.id_
+  );
 
   this.constructor === Object ? module.exports = _ : this._ = _;
 })();
