@@ -173,6 +173,34 @@ describe("Test of CTE", function () {
       _([1, null, 3, 4, undefined, null, null, 7]).adapt(5, 8).adapt(2).adapt(9)._
     ).toEqual([1, 5, 3, 4, 8, 2, 9, 7])
   );
+
+
+  //pushL
+  it(
+    "pushL",
+    () => expect(_([2, 3, 4]).pushL(0, 1, 5)._).toEqual([0, 1, 5, 2, 3, 4])
+  );
+  
+  
+  //pushR
+  it(
+    "pushL",
+    () => expect(_([2, 3, 4]).pushR(0, 1, 5)._).toEqual([2, 3, 4, 0, 1, 5])
+  );
+  
+  
+  //popL
+  it(
+    "pushL",
+    () => expect(_([2, 3, 4]).popL._).toBe(2)
+  );
+  
+  
+  //popR
+  it(
+    "pushL",
+    () => expect(_([2, 3, 4]).popR._).toBe(4)
+  );
   
   
   // by 
