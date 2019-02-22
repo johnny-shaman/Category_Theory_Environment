@@ -243,7 +243,7 @@ _({a: {b: {c: 5}}).get("a", "c", "b")._ === null;
 
 
 // set is lens's setter ********************************************************
-_({}).set(5, "a", "b", "c")._;  // {a: {b: {c: 5}}
+_({}).set(5, "a", "b", "c")._;  // {a: {b: {c: 5}}}
 
 
 // delete is delete properties and methods *************************************
@@ -299,3 +299,22 @@ _(v => v + 9).done(5).redo(18)._ === 32;
 
 // part is partial applying on wrapped function ********************************
 _((x, y, z) => x + y + z).part(null, null, 5).part(null, 3).part(1)._ === 9;
+
+
+// on can EventEmitter .on (Only Node.js)***************************************
+_(Emmittable).on({
+  a: 0
+  get (res, req) {
+    this.a ++;
+  }
+})._
+
+
+// on can EventEmitter .on (Only Node.js)***************************************
+_(Emmittable).once({
+  a: 0
+  get (res, req) {
+    this.a ++;
+  }
+})._
+
