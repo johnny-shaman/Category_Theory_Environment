@@ -83,6 +83,10 @@ describe("Test of CTE", function () {
     )
   );
 
+  it(
+    "flat on null",
+    () => expect(_().flat()._).toBe(null)
+  );
 
   // fold reduce
   it(
@@ -255,7 +259,7 @@ describe("Test of CTE", function () {
         writable: true,
         enumerable: true,
         value: 3
-      }})._.b
+      }})._
     ).toEqual({a: 5, b: 3})
   );
   
@@ -265,11 +269,11 @@ describe("Test of CTE", function () {
     "make, create",
     () => {
       expect(
-        _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}}).lift(t => _(t._.add(3), t)).re._.a
+        _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}}).fork.endo(t => t.add(3)).base._.a
       ).toBe(8);
   
       expect(
-        _({add (v) {this.a += v}}).create({a:{writable: true, value: 5}}).lift(t => _(t._.add(3), t)).re._.a
+        _({add (v) {this.a += v}}).create({a:{writable: true, value: 5}}).fork.endo(t => t.add(3)).base._.a
       ).toBe(8);
     }
   );
@@ -279,7 +283,7 @@ describe("Test of CTE", function () {
   it(
     "other",
     () => expect(
-      _([3, 4, 5]).other.endo(t => t.push(6, 7, 8))._
+      _([3, 4, 5]).other.vary(t => t.push(6, 7, 8))._
     ).toEqual([6, 7, 8])
   ); // []
   

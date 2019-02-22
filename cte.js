@@ -60,6 +60,12 @@
         return this._ == null ? this : f(this._, this.$);
       }
     },
+    vary: {
+      configurable: true,
+      value (f, ...v) {
+        return this.fork.endo(f, ...v).base;
+      }
+    },
     is: {
       configurable: true,
       get () {
@@ -97,7 +103,7 @@
       value (f) {
         return this.lift(
           t => t.is._ === Array
-          ? t.fork.endo(t => t.forEach(f)).base
+          ? t.vary(t => t.forEach(f))
           : t.fork.sets.endo(t => t.forEach(([k, v]) => f(k, v))).base
         );
       }
@@ -139,13 +145,13 @@
     pushL: {
       configurable: true,
       value (...v) {
-        return this.fork.endo(t => t => t.unshift(...v)).base;
+        return this.vary(t => t => t.unshift(...v));
       }
     },
     pushR: {
       configurable: true,
       value (...v) {
-        return this.fork.endo(t => t => t.push(...v)).base;
+        return this.vary(t => t => t.push(...v));
       }
     },
     popL: {
@@ -231,13 +237,13 @@
     copy: {
       configurable: true,
       get () {
-        return this.endo(t => t.other.define(t.descript._));
+        return this.lift(t => t.other.define(t.descript._));
       }
     },
     clone: {
       configurable: true,
       get () {
-        return this.endo(
+        return this.lift(
           t => t.sets.endo(a => a.reduce((p, [k, v]) => p.put({
             [k]: (
               v instanceof Object
@@ -263,7 +269,7 @@
     delete: {
       configurable: true,
       value (...h) {
-        return this.lift(t => _(h).each(k => t.flat(o => delete o[k])));
+        return this.vary(o => _(h).each(k => delete o[k]));
       }
     },
     been: {
@@ -289,8 +295,8 @@
     list: {
       configurable: true,
       get () {
-        return this.endo(
-          t => t.length == null
+        return this.lift(
+          t => t._.length == null
           ? t.copy.put({length: t.keys._.length}).list
           : t.endo(Array.from)
         );
@@ -299,8 +305,8 @@
     json: {
       configurable: true,
       get () {
-        return this.endo(
-          t => _.is_(t) === String
+        return this.lift(
+          t => t.is._ === String
           ? t.endo(JSON.parse)
           : t.endo(JSON.stringify)
         );
@@ -309,16 +315,16 @@
     done: {
       configurable: true,
       value (...v) {
-        return this.endo(
-          t => t.re == null && t.bind(f => _(f(...v), f))
+        return this.lift(
+          t => t.$ == null && t.flat(f => _(f(...v), f))
         );
       }
     },
     redo: {
       configurable: true,
       value (...v) {
-        return this.endo(
-          t => t.re(...v)
+        return this.lift(
+          t => _(t.$(...v))
         );
       }
     },
