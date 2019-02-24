@@ -1,6 +1,6 @@
 {
   "name": "cte",
-  "version": "0.0.3",
+  "version": "0.0.6",
   "description": "Category Theory Environment on javascript prototype definition",
   "main": "cte.js",
   "scripts": {

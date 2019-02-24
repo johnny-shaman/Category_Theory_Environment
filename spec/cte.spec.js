@@ -2,38 +2,26 @@ describe("Test of CTE", function () {
   "use strict";
 
   const _ = require("../cte.js");
-  const EventEmitter = require("events").EventEmitter;
-
-  const EETest = function () {
-    EventEmitter.call(this);
-  };
-
-  EETest.prototype = Object.create(EventEmitter.prototype, {
-    constructor: {
-      configurable: true,
-      writable: true,
-      value: EETest
-    }
-  });
-
-  const eeTest = _(new EETest());
 
   // static function sector...
-  
-  //Identity
+  // Identity
   it(
     "Identity Function",
     () => expect(_.id_({a: 5}).a).toBe(5)
   );
   
 
-  //get Constructor
+  // get Constructor
   it(
     "Type Check",
-    () => expect(_.is_(3)).toBe(Number)
+    () =>{
+      expect(_.is_(3)).toBe(Number);
+      expect(_.is_()).toBe(null);
+      expect(_.is_(null)).toBe(null);
+    }
   );
   
-  //join or extract 
+  // join or extract 
   it(
     "join and extract",
     () => expect(_({a: 5})._).toEqual({a: 5})
@@ -175,28 +163,28 @@ describe("Test of CTE", function () {
   );
 
 
-  //pushL
+  // pushL
   it(
     "pushL",
     () => expect(_([2, 3, 4]).pushL(0, 1, 5)._).toEqual([0, 1, 5, 2, 3, 4])
   );
   
   
-  //pushR
+  // pushR
   it(
     "pushL",
     () => expect(_([2, 3, 4]).pushR(0, 1, 5)._).toEqual([2, 3, 4, 0, 1, 5])
   );
   
   
-  //popL
+  // popL
   it(
     "pushL",
     () => expect(_([2, 3, 4]).popL._).toBe(2)
   );
   
   
-  //popR
+  // popR
   it(
     "pushL",
     () => expect(_([2, 3, 4]).popR._).toBe(4)
@@ -311,7 +299,7 @@ describe("Test of CTE", function () {
   it(
     "other",
     () => expect(
-      _([3, 4, 5]).other.vary(t => t.push(6, 7, 8))._
+      _([3, 4, 5]).other.use(t => t.push(6, 7, 8))._
     ).toEqual([6, 7, 8])
   ); // []
   
@@ -369,16 +357,20 @@ describe("Test of CTE", function () {
   it(
     "been like with Statement",
     () => {
-      let o = Object.create(
-        {add (v) {
-          this.a = this.a + v;
-        }},
-        {a: {
-          value: 5
-        }}
-      );
-      expect(_(o).been.add(3).add(5).to.get("a")._).toBe(13);
-      expect(_(o).been.add(3).add(5)._.a).toBe(13);
+      let O = class {
+        constructor (a) {
+          this.a = a;
+        }
+        add (v) {
+          this.a += v;
+        }
+      };
+
+      expect(_(new O(8)).been.add(3).add(5)._).toEqual({a: 16});
+      expect(_(new O(8)).been.add(3).add(5).to.get("a")._).toBe(16);
+      expect(
+        _({a: {b: 5}}).been.b(6, "c").a(3, "c", "d").a(8, "b")._
+      ).toEqual({a: {b: 5}, c: {d: 3}, b: 8});
     }
   );
   
@@ -410,7 +402,7 @@ describe("Test of CTE", function () {
   // redo reforce on wrapped function 
   it(
     "redo",
-    () => expect(_(v => v + 9).done(5).redo(18)._).toBe(32)
+    () => expect(_(v => v + 9).done(5).redo(18)._).toBe(27)
   );
   
   
@@ -418,28 +410,7 @@ describe("Test of CTE", function () {
   it(
     "part",
     () => expect(
-      _((x, y, z) => x + y + z).part(null, null, 5).part(null, 3).part(1)._
+      _((x, y, z) => x + y + z).part(null, null, 5)(null, 3)(1)._
     ).toBe(9)
   );
-  
-  
-  // on can EventEmitter .on (Only Node.js)
-  it(
-      ".once",
-      () => expect(
-        eeTest.once({
-          "put" (e) {return e}
-        })._.emit("put")
-      ).toBe(true)
-    );
-  
-  it(
-    ".on",
-    () => expect(
-      eeTest.on({
-        "get" (e) {return e}
-      })._.emit("get")
-    ).toBe(true)
-  );
-
 });

@@ -60,7 +60,7 @@
         return this._ == null ? this : f(this._, this.$);
       }
     },
-    vary: {
+    use: {
       configurable: true,
       value (f, ...v) {
         return this.fork.endo(f, ...v).base;
@@ -103,7 +103,7 @@
       value (f) {
         return this.lift(
           t => t.is._ === Array
-          ? t.vary(t => t.forEach(f))
+          ? t.use(t => t.forEach(f))
           : t.fork.sets.endo(t => t.forEach(([k, v]) => f(k, v))).base
         );
       }
@@ -145,13 +145,13 @@
     pushL: {
       configurable: true,
       value (...v) {
-        return this.vary(t => t => t.unshift(...v));
+        return this.use(t => t.unshift(...v));
       }
     },
     pushR: {
       configurable: true,
       value (...v) {
-        return this.vary(t => t => t.push(...v));
+        return this.use(t => t.push(...v));
       }
     },
     popL: {
@@ -269,7 +269,7 @@
     delete: {
       configurable: true,
       value (...h) {
-        return this.vary(o => _(h).each(k => delete o[k]));
+        return this.use(o => _(h).each(k => delete o[k]));
       }
     },
     been: {
@@ -278,14 +278,12 @@
         return new Proxy(this, {
           get (t, k) {
             switch (k) {
-              case "_": return this._;
-              case "to": return this;
+              case "_": return t._;
+              case "to": return t;
               default: return (...v) => t.lift(
-                t => t.get(k).is(
-                  Function,
-                  ({_}) => _(...v),
-                  t => t.set(v.shift(), v)
-                )
+                t => t.get(k).is._ === Function
+                ? t.use(o => o[k].apply(o, v))
+                : t.set(v.shift(), ...v)
               ).been;
             }
           }
@@ -297,7 +295,7 @@
       get () {
         return this.lift(
           t => t._.length == null
-          ? t.copy.put({length: t.keys._.length}).list
+          ? t.put({length: t.keys._.length}).list
           : t.endo(Array.from)
         );
       }
@@ -316,24 +314,25 @@
       configurable: true,
       value (...v) {
         return this.lift(
-          t => t.$ == null && t.flat(f => _(f(...v), f))
+          t => t.$ == null
+          ? t.fork.endo(f => f(...v))
+          : t
         );
       }
     },
     redo: {
       configurable: true,
       value (...v) {
-        return this.lift(
-          t => _(t.$(...v))
-        );
+        return this.lift(t => t.base.fork.endo(f => f(...v)));
       }
     },
     part: {
       configurable: true,
       value (...v) {
-        return _(v).fullen(
-          t => t.endo(f => f(...v)),
-          t => t.lift(t => (...vv) => t.part(..._(v).adapt(...vv)._))
+        return this.lift(
+          t => _.fullen_(v)
+          ? t.endo(f => f(...v))
+          : (...w) => t.lift(t => t.part(..._(v).adapt(...w)._))
         );
       }
     }
@@ -344,23 +343,8 @@
   _.fullen_ = a => !(a.includes(undefined) || a.includes(null));
 
   _(this).endo(
-    t => _.is_(t) === Object,
-    () => _(_).by.define({
-      on: {
-        configurable: true,
-        value (d) {
-          return _(d).each(this["#"].on.bind(this["#"]))._;
-        }
-      },
-      once: {
-        configurable: true,
-        value (d) {
-          return _(d).each(this["#"].once.bind(this["#"]))._;
-        }
-      }
-    }),
-    _.id_
+    t => _.is_(t) === Object
+    ? module.exports = _
+    : t._ = _
   );
-
-  this.constructor === Object ? module.exports = _ : this._ = _;
 })();
