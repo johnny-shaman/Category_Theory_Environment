@@ -340,7 +340,9 @@
 
   _.id_ = v => v == null ? null : v.valueOf();
   _.is_ = v => v == null ? null : v.constructor;
-  _.fullen_ = a => !(a.includes(undefined) || a.includes(null));
+  _.fullen_ = a => !(
+    Object.values(a).includes(undefined) || Object.values(a).includes(null)
+  );
 
   _(this).endo(
     t => _.is_(t) === Object

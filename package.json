@@ -1,7 +1,7 @@
 {
   "name": "cte",
-  "version": "0.0.6",
-  "description": "Category Theory Environment on javascript prototype definition",
+  "version": "1.0.0",
+  "description": "Category Theory Environment on javascript",
   "main": "cte.js",
   "scripts": {
     "test": "istanbul cover jasmine-node ./spec/cte.spec.js"
@@ -14,11 +14,11 @@
     "Category Theory",
     "No Constructive",
     "No let",
-    "No variable",
+    "No var",
     "No const",
     "functor",
-    "Applicative",
     "Monad",
+    "Comonad",
     "Algebra",
     "Algebraic",
     "CoAlgebra"

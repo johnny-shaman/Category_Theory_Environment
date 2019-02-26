@@ -1,26 +1,35 @@
 # Category Theory Environment
 Enpowerment Prototype Object on algebraic and Category Theory
 
+[![Build Status](https://travis-ci.org/johnny-shaman/Category_Theory_Environment.svg?branch=master)](https://travis-ci.org/johnny-shaman/Category_Theory_Environment)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f7dc51710c060313dea4/test_coverage)](https://codeclimate.com/github/johnny-shaman/Category_Theory_Environment/test_coverage)
+
 Usage:
 ```javascript
-
 // static function sector... ***************************************************
 
 //Identity
 _.id_({a: 5}).a === 5
 
-//function compose
-_.to_(v => v + 3, v => v * 8)(5)
-
-//get type
+//get constructor function (get type)
 _.is_([]) === Array;
+_.is_({}) === Object;
+
+//fullen
+_.fullen_([1, 2, 3]) === true;
+_.fullen_([1, null, 3]) === false;
+_.fullen_([1, undefined, 3]) === false;
+
+_.fullen_({a: 5, b: 3}) === true;
+_.fullen_({a: 5, b; null}) === false;
+_.fullen_({a: null, b: 3}) === false;
 
 
-//join or extract **************************************************************
-_({a: 5})._ .a === 5
+// join ************************************************************************
+_({a: 5})._.a === 5
 
 
-/*******************************************************************************
+/*lift**************************************************************************
   lift is applying whole Functor.
   lift is Categoly theory's "Unit".
 */
@@ -32,7 +41,7 @@ _({a: 5}).lift(t => t.put({b: 3}))._.b === 3;
 _({a: 5}).lift(t => t.keys).endo(t => t.reduce((p, c) => p + c))._
 
 
-/*******************************************************************************
+/*flat**************************************************************************
   flat can accessor into a value on closure.
   flat is Categoly theory's "CoUnit".
   flat can map likely flatMap
@@ -41,8 +50,17 @@ _({a: 5}).lift().flat()._.a === 5;
 _({a: 5}).flat(o => o.a) === 5;
 _({a: 5}).flat().a === 5;
 
-//Can Duplicate it
-_({a: 5}).flat(o => _(o).put({b: 3}))._.b === 3;
+// flat Have a Kleisli Triple
+
+// Left Identity
+_({a: 5}).flat(o => _({a: o.a * 3}))._.a === (o => _({a: o.a * 3}))({a: 5})._.a;
+
+// Right Identity
+_({a: 5}).flat(_).bind(_)._.a === 5
+
+// Associativity
+_({a: 5}).flat(o => _({a: o.a * 3})).bind(o => _({a: o.a + 5}))._ === 20;
+_({a: 5}).flat(_.to_(o => _({a: o.a * 3}), o => _({a: o.a + 5})))._ === 20;
 
 
 // endo is a endo functor ******************************************************
@@ -52,20 +70,19 @@ _({a: 5}).endo(o => o.a)._ === 5;
 _({a: 5}).endo(o => o.a).endo(v => v + 8).endo(v => v * 5)._ === 65;
 
 
-// bind Have a Kleisli Triple **************************************************
-
-// Left Identity
-_({a: 5}).bind(o => _({a: o.a * 3}))._.a === (o => _({a: o.a * 3}))({a: 5})._.a;
-
-// Right Identity
-_({a: 5}).bind(_).bind(_)._.a === 5
-
-// Associativity
-_({a: 5}).bind(o => _({a: o.a * 3})).bind(o => _({a: o.a + 5}))._ === 20;
-_({a: 5}).bind(_.to_(o => _({a: o.a * 3}), o => _({a: o.a + 5})))._ === 20;
+// fork is Comonad's duplicate**************************************************
+_({a: 5}).fork;
 
 
-// take is Comonad's extend ****************************************************
+// $ is extract ****************************************************************
+_({a: 5}).fork.$.a === 5;
+
+
+// base traverce Comonad to Monad **********************************************
+_({a: 5}).fork.endo(o => o.a).base._ //{a: 5};
+
+
+// use is Comonad's extend *****************************************************
 _(Object.create(
   {add (v) {
     this.a + v;
@@ -73,56 +90,14 @@ _(Object.create(
   {a: {
     value: 5
   }}
-)).take(t => t._.add(8))._.a === 5
-
-
-// ask *************************************************************************
-
-// true
-_({a: 5}).ask(
-  t => t._.a === 5,
-  t => t.put({b: 3}),
-  t => t.put({c: 8})
-)._.b === 3;
-
-//false
-_({a: 5}).ask(
-  t => t._.a === 8,
-  t => t.put({b: 3}),
-  t => t.put({c: 8})
-)._.c === 8;
+)).use(t => t._.add(8))._.a === 5
 
 
 // is **************************************************************************
 
-// true
-_({a: 5}).is(
-  Object
-  t => t.put({b: 3}),
-  t => t.put({c: 8})
-)._.b === 3;
-
-// false
-_({a: 5}).is(
-  Array,
-  t => t.put({b: 3}),
-  t => t.put({c: 8})
-)._.c === 8;
-
-
-// fullen **********************************************************************
-
-// true
-_([1, 2, 3]).fullen(
-  t => t.pushR(4),
-  t => t.pushL(0)
-)._[3] === 4;
-
-// false
-_([2, null, 3]).fullen(
-  t => t.pushR(4),
-  t => t.pushL(0)
-)._[0] === 0;
+_({a: 5}).is._ === Object;
+_([1, 2, 3]).is._ === Array;
+_(new Foo()).is._ === Foo;
 
 
 // fold reduce *****************************************************************
@@ -154,12 +129,28 @@ _({a: 5, b: 3}).drop("a")._.b === 3;
 
 
 // swap ************************************************************************
-_({a: 5, b: 3}).swap._[5] === "a"
-_({a: 5, b: 3}).swap._[3] === "b"
+_({a: 5, b: 3}).swap._[5] === "a";
+_({a: 5, b: 3}).swap._[3] === "b";
 
 
 // adapt ***********************************************************************
 _([1, null, 3, 4, undefined]).adapt(5, 8)._ // [1, 5, 3, 4, 8]
+
+
+// pushL ***********************************************************************
+_([1, 2, 3]).pushL(5, 6)._; // [5, 6, 1, 2, 3]
+
+
+// pushR ***********************************************************************
+_([1, 2, 3]).pushR(5, 6)._; // [1, 2, 3, 5, 6]
+
+
+// popL ************************************************************************
+_([1, 2, 3]).popL._ === 1;
+
+
+// popR ************************************************************************
+_([1, 2, 3]).popR._ === 3;
 
 
 // by **************************************************************************
@@ -175,8 +166,8 @@ _({a: 5, b: 3}).keys._[0] === "a";
 _({a: 5, b: 3}).vals._[1] === 3;
 
 
-// all *************************************************************************
-_({a: 5, b: 3}).all._[0][1] === 5; // Object.entries
+// sets *************************************************************************
+_({a: 5, b: 3}).sets._[0][1] === 5; // Object.entries
 
 
 // put *************************************************************************
@@ -207,18 +198,46 @@ _({a: 5, b: 3}).struct({a: {
 _({a: 5, b: 3}).struct({a: {
   configurable: true,
   value: 3
-}}).by._.a === 5;
+}}).by._.a === 5; // getPrototypeOf
 
 
 // define **********************************************************************
 _({a: 5}).define({b: {
   configurable: true,
   value: 3
-}})._.b === 3
+}})._.b === 3;
 
 
-// make ************************************************************************
-_({add (v) {this.a = a + v}}).make({a: 5}).take(t => t._.add(3))._.a === 8;
+// make create *****************************************************************
+_({
+  add (v) {
+    this.a = a + v
+  }
+})
+.make({
+  a: {
+    writable: true,
+    value: 5
+  }
+})
+.use(t => t._.add(3))
+._
+.a === 8;
+
+_({
+  add (v) {
+    this.a = a + v
+  }
+})
+.create({
+  a: {
+    writable: true,
+    value: 5
+  }
+})
+.use(t => t._.add(3))
+._
+.a === 8;
 
 
 // other get other one *********************************************************
@@ -281,6 +300,21 @@ _(Object.create(
 .add(5)
 ._
 .a === 13
+
+_(Object.create(
+  {add (v) {
+    this.a + v;
+  }},
+  {a: {
+    value: 5
+  }}
+))
+.been
+.b(4, "c", "d")
+._
+.b
+.c
+.d === 4
 
 
 // list get to Array from Array like Object ************************************

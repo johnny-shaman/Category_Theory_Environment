@@ -14,10 +14,23 @@ describe("Test of CTE", function () {
   // get Constructor
   it(
     "Type Check",
-    () =>{
+    () => {
       expect(_.is_(3)).toBe(Number);
       expect(_.is_()).toBe(null);
       expect(_.is_(null)).toBe(null);
+    }
+  );
+
+  // fullen
+  it(
+    "fullen",
+    () => {
+      expect(_.fullen_({a: undefined})).toBe(false);
+      expect(_.fullen_({a: null})).toBe(false);
+      expect(_.fullen_({a: 0, b: false})).toBe(true);
+      expect(_.fullen_([0, 1, 2, null])).toBe(false);
+      expect(_.fullen_([0, undefined, 2, 3])).toBe(false);
+      expect(_.fullen_([0, 1, 2, 3])).toBe(true);
     }
   );
   
