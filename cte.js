@@ -66,6 +66,18 @@
         return this.fork.endo(f, ...v).base;
       }
     },
+    affix: {
+      configurable: true,
+      value (f) {
+        return this.fork.lift(f).base;
+      }
+    },
+    annex: {
+      configurable: true,
+      value (f) {
+        return this.fork.flat(f).base;
+      }
+    },
     is: {
       configurable: true,
       get () {

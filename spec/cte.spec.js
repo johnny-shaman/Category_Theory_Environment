@@ -36,10 +36,39 @@ describe("Test of CTE", function () {
   
   // join or extract 
   it(
-    "join and extract",
+    "join",
     () => expect(_({a: 5})._).toEqual({a: 5})
   );
   
+  it(
+    "use is extend inclusive Object",
+    () => expect(
+      _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}})
+      .use(t => t.add(6))
+      .use(t => t.add(10))
+      ._.a
+    ).toBe(21)
+  );
+  
+  it(
+    "affix",
+    () => expect(
+      _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}})
+      .affix(t => _(t._.add(6), t.$))
+      .affix(t => _(t._.add(10), t.$))
+      ._.a
+    ).toBe(21)
+  );
+  
+  it(
+    "annex",
+    () => expect(
+      _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}})
+      .annex((o, s) => _(o.add(6), s))
+      .annex((o, s) => _(o.add(10), s))
+      ._.a
+    ).toBe(21)
+  );
   
   /*
     lift is applying whole Functor.
@@ -54,7 +83,7 @@ describe("Test of CTE", function () {
     "lift #2",
     () => expect(_({a: 5}).lift(t => t.put({b: 3}))._).toEqual({a: 5, b: 3})
   );
-  
+
 
   // Left Identity
   it(
