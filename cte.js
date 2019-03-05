@@ -69,13 +69,13 @@
     affix: {
       configurable: true,
       value (f) {
-        return this.fork.lift(f).base;
+        return this.fork.lift(f);
       }
     },
     annex: {
       configurable: true,
       value (f) {
-        return this.fork.flat(f).base;
+        return this.fork.flat(f);
       }
     },
     is: {
@@ -176,6 +176,18 @@
       configurable: true,
       get () {
         return this.endo(a => a.pop());
+      }
+    },
+    toggle: {
+      configurable: true,
+      value (...d) {
+        return this.annex(
+          (a, o) => _(a).filter(
+            v => !d.includes(v)
+          ).pushR(...d.filter(
+            v => !o.includes(v)
+          ))
+        );
       }
     },
     by: {

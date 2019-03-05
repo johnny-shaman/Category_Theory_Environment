@@ -54,8 +54,8 @@ describe("Test of CTE", function () {
     "affix",
     () => expect(
       _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}})
-      .affix(t => _(t._.add(6), t.$))
-      .affix(t => _(t._.add(10), t.$))
+      .affix(t => t.been.add(6).to)
+      .affix(t => t.been.add(10).to)
       ._.a
     ).toBe(21)
   );
@@ -64,8 +64,8 @@ describe("Test of CTE", function () {
     "annex",
     () => expect(
       _({add (v) {this.a += v}}).make({a:{writable: true, value: 5}})
-      .annex((o, s) => _(o.add(6), s))
-      .annex((o, s) => _(o.add(10), s))
+      .annex((o, s) => _(s, o.add(6)))
+      .annex((o, s) => _(s, o.add(10)))
       ._.a
     ).toBe(21)
   );
@@ -221,17 +221,22 @@ describe("Test of CTE", function () {
   
   // popL
   it(
-    "pushL",
+    "popL",
     () => expect(_([2, 3, 4]).popL._).toBe(2)
   );
   
   
   // popR
   it(
-    "pushL",
+    "popR",
     () => expect(_([2, 3, 4]).popR._).toBe(4)
   );
-  
+
+  //toggle
+  it(
+    "toggle",
+    () => expect(_([1, 2, 3, 4, 5]).toggle(2, 5, 6, 7, 8)._).toEqual([1, 3, 4, 6, 7, 8])
+  );
   
   // by 
   it(
