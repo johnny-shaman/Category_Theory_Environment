@@ -329,7 +329,7 @@
       get () {
         return this.lift(
           t => t.is._ === String
-          ? t.endo(s => {try {return JSON.parse(s)} catch (e) {s}})
+          ? t.endo(s => {try {return JSON.parse(s)} catch (e) {return s}})
           : t.endo(JSON.stringify)
         );
       }
