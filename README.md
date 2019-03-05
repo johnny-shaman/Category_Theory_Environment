@@ -90,7 +90,7 @@ _(Object.create(
   {a: {
     value: 5
   }}
-)).use(t => t.add(8))._.a === 5
+)).use(t => o.add(8))._.a === 13
 
 
 //affix is Comonad's Can Lift It ***********************************************
@@ -101,10 +101,10 @@ _(Object.create(
   {a: {
     value: 5
   }}
-)).affix(t => t.been.add(8).to)._.a === 5
+)).affix(t => t.been.add(8).to)._.a === 13
 
 
-//annex is Comonad's Can Lift It ***********************************************
+//annex is Comonad's Can Flat It ***********************************************
 _(Object.create(
   {add (v) {
     this.a + v;
@@ -112,7 +112,7 @@ _(Object.create(
   {a: {
     value: 5
   }}
-)).annex(t => t.been.add(8).to)._.a === 5
+)).annex(o => _(o).been.add(8).to)._.a === 13
 
 
 // is **************************************************************************
