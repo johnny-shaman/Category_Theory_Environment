@@ -56,7 +56,7 @@ _({a: 5}).flat().a === 5;
 _({a: 5}).flat(o => _({a: o.a * 3}))._.a === (o => _({a: o.a * 3}))({a: 5})._.a;
 
 // Right Identity
-_({a: 5}).flat(_).bind(_)._.a === 5
+_({a: 5}).flat(_).flat(_)._.a === 5
 
 // Associativity
 _({a: 5}).flat(o => _({a: o.a * 3})).flat(o => _({a: o.a + 5}))._ === 20;
