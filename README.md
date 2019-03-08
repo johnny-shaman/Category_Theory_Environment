@@ -38,7 +38,7 @@ _({a: 5}).lift()._._.a === _({a: 5}).lift(_)._._.a;
 _({a: 5}).lift(t => t.put({b: 3}))._.b === 3;
 
 //Can it in Associativity
-_({a: 5}).lift(t => t.keys).endo(t => t.reduce((p, c) => p + c))._
+_({a: 5}).lift(t => t.keys.endo(t => t.reduce((p, c) => p + c))._
 
 
 /*flat**************************************************************************
