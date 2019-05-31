@@ -14,7 +14,7 @@
         get () {
           return f;
         }
-      }
+      },
     });
   };
   Object.defineProperties(_.prototype, {
@@ -51,7 +51,7 @@
     base: {
       configurable: true,
       get () {
-        return _(this.$);
+        return _(this.$, this._);
       }
     },
     flat: {
@@ -370,7 +370,22 @@
 
   _(this).endo(
     t => _.is_(t) === Object
-    ? module.exports = _
+    ? module.exports = _(_).fork.endo(_ => _.prototype).define({
+      on: {
+        configurable: true,
+        value (o) {
+          return this.use(t => _(o).each((k, f) => t.on(k, f.bind(o))));
+        }
+      },
+      once: {
+        configurable: true,
+        value (o) {
+          return this.use(t => _(o).each((k, f) => t.on(k, f.bind(o))));
+        }
+      }
+    })
+    .base
+    ._
     : t._ = _
   );
 })();

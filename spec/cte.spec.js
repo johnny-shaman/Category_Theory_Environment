@@ -2,6 +2,8 @@ describe("Test of CTE", function () {
   "use strict";
 
   const _ = require("../cte.js");
+  const EventEmitter = require("events").EventEmitter;
+
 
   // static function sector...
   // Identity
@@ -435,6 +437,7 @@ describe("Test of CTE", function () {
     () => {
       expect(_({a: 5}).json._).toBe(JSON.stringify({a: 5}));
       expect(_(JSON.stringify({a: 5})).json._).toEqual({a: 5});
+      expect(_("test string").json._).toBe("test string");
     }
   );
   
@@ -459,5 +462,37 @@ describe("Test of CTE", function () {
     () => expect(
       _((x, y, z) => x + y + z).part(null, null, 5)(null, 3)(1)._
     ).toBe(9)
+  );
+
+    const EETest = function () {
+    EventEmitter.call(this);
+  };
+
+  EETest.prototype = Object.create(EventEmitter.prototype, {
+    constructor: {
+      configurable: true,
+      writable: true,
+      value: EETest
+    }
+  });
+
+  const eeTest = _(new EETest());
+
+  it(
+    "once",
+    () => expect(
+      eeTest.once({
+        "put" (e) {return e}
+      })._.emit("put")
+    ).toBe(true)
+  );
+
+  it(
+    "on",
+    () => expect(
+      eeTest.on({
+        "get" (e) {return e}
+      })._.emit("get")
+    ).toBe(true)
   );
 });

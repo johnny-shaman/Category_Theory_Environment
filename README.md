@@ -4,8 +4,25 @@ Enpowerment Prototype Object on algebraic and Category Theory
 [![Build Status](https://travis-ci.org/johnny-shaman/Category_Theory_Environment.svg?branch=master)](https://travis-ci.org/johnny-shaman/Category_Theory_Environment)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f7dc51710c060313dea4/test_coverage)](https://codeclimate.com/github/johnny-shaman/Category_Theory_Environment/test_coverage)
 
-Usage:
-```javascript
+## Usage
+
+### node
+~~~bash
+npm install losand
+~~~
+~~~javascript
+const _ = require("losand")
+~~~
+### worker
+ex. inside ./lib subfolder
+~~~javascript
+importScripts("./lib/losand.js")
+~~~
+### browser
+~~~html
+<script src="https://cdn.jsdelivr.net/npm/losand@1.5.0/losand.js"></script>
+~~~
+~~~javascript
 // static function sector... ***************************************************
 
 //Identity
@@ -364,3 +381,46 @@ _(v => v + 9).done(5).redo(18)._ === 32;
 _((x, y, z) => x + y + z).part(null, null, 5)(null, 3)(1)._ === 9;
 
 
+~~~
+## Event driven development
+
+~~~javascript
+const EETest = _(EventEmitter).fork(function () {
+  EventEmitter.call(this)
+})._
+
+const eeTest = new EETest()
+
+//addLitener
+_(eeTest).on({
+  a: 3,
+  "get" () {
+    this.a === 3 // true
+    this.put() // can call it
+  },
+  "put": () => {},
+  "post": () => {},
+  "delete": () => {}
+})
+
+//addOnce
+_(eeTest).once({
+  b: 10,
+  "get" () {
+    this.b === 10 // true
+    this.put() // can call it
+  },
+  "put": () => {},
+  "post": () => {},
+  "delete": () => {}
+})
+
+//Example with Promise
+
+const promise = new Promise((res, rej) => {
+  res({});
+})
+.then(v => _(v))
+.then(v => v.draw(v => ({foo: foo(v)}))
+.then(v => v.map(t => t.foo));
+~~~
