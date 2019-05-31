@@ -5,22 +5,21 @@ Enpowerment Prototype Object on algebraic and Category Theory
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f7dc51710c060313dea4/test_coverage)](https://codeclimate.com/github/johnny-shaman/Category_Theory_Environment/test_coverage)
 
 ## Usage
-
 ### node
 ~~~bash
 npm install losand
 ~~~
 ~~~javascript
-const _ = require("losand")
+const _ = require("cte")
 ~~~
 ### worker
 ex. inside ./lib subfolder
 ~~~javascript
-importScripts("./lib/losand.js")
+importScripts("./lib/cte.js")
 ~~~
 ### browser
 ~~~html
-<script src="https://cdn.jsdelivr.net/npm/losand@1.5.0/losand.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cte@1.2.1/cte.js"></script>
 ~~~
 ~~~javascript
 // static function sector... ***************************************************
