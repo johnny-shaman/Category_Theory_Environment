@@ -380,7 +380,7 @@
       once: {
         configurable: true,
         value (o) {
-          return this.use(t => _(o).each((k, f) => t.on(k, f.bind(o))));
+          return this.use(t => _(o).each((k, f) => t.once(k, f.bind(o))));
         }
       }
     })

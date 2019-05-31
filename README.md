@@ -19,7 +19,7 @@ importScripts("./lib/cte.js")
 ~~~
 ### browser
 ~~~html
-<script src="https://cdn.jsdelivr.net/npm/cte@1.2.1/cte.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cte@1.2.2/cte.js"></script>
 ~~~
 ~~~javascript
 // static function sector... ***************************************************
