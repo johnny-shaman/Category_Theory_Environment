@@ -19,7 +19,7 @@ importScripts("./lib/cte.js")
 ~~~
 ### browser
 ~~~html
-<script src="https://cdn.jsdelivr.net/npm/cte@1.2.2/cte.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cte@1.2.3/cte.js"></script>
 ~~~
 ~~~javascript
 // static function sector... ***************************************************
@@ -106,7 +106,7 @@ _(Object.create(
   {a: {
     value: 5
   }}
-)).use(t => o.add(8))._.a === 13
+)).use(o => o.add(8))._.a === 13
 
 
 //affix is Comonad's Can Lift It ***********************************************

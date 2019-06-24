@@ -464,7 +464,7 @@ describe("Test of CTE", function () {
     ).toBe(9)
   );
 
-    const EETest = function () {
+  const EETest = function () {
     EventEmitter.call(this);
   };
 
