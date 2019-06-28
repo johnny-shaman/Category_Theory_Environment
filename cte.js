@@ -5,15 +5,11 @@
     return Object.create(_.prototype, {
       "#": {
         configurable: true,
-        get () {
-          return v;
-        }
+        value: v
       },
       "@": {
         configurable: true,
-        get () {
-          return f;
-        }
+        value: f
       },
     });
   };
