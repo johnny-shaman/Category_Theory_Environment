@@ -5,11 +5,15 @@
     return Object.create(_.prototype, {
       "#": {
         configurable: true,
-        value: v
+        get () {
+          return v;
+        }
       },
       "@": {
         configurable: true,
-        value: f
+        get () {
+          return f;
+        }
       },
     });
   };
@@ -358,7 +362,7 @@
     }
   });
 
-  _.id_ = v => v == null ? null : v.valueOf();
+  _.id_ = v => v == null ? null : v;
   _.is_ = v => v == null ? null : v.constructor;
   _.fullen_ = a => !(
     Object.values(a).includes(undefined) || Object.values(a).includes(null)
