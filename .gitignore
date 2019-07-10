@@ -64,3 +64,4 @@ typings/
 .git
 .npmignore
 /coverage
+.directory
