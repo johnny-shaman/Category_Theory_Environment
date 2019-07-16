@@ -5,6 +5,10 @@ env:
 language: node_js
   - "stable"
 
+branches:
+  except:
+    - develop
+
 addons:
   apt:
     packages:
