@@ -32,8 +32,8 @@
     },
     lift: {
       configurable: true,
-      value (f = _) {
-        return f(this);
+      value (...f) {
+        return f.length ? f.reduceRight((p, c) => p(c), this) : _(this);
       }
     },
     fork: {
@@ -42,10 +42,16 @@
         return _(this._, this._);
       }
     },
-    endo: {
+    to: {
       configurable: true,
       value (f = _.id_, ...v) {
         return this._ == null ? this : _(f(this._, ...v), this.$);
+      }
+    },
+    endo: {
+      configurable: true,
+      value (...f) {
+        return this._ == null ? this : _(f.reduceRight((p, c) => c(p) ,this._), this.$);
       }
     },
     base: {
@@ -56,32 +62,40 @@
     },
     flat: {
       configurable: true,
-      value (f = _.id_) {
-        return this._ == null ? this : f(this._, this.$);
+      value (...f) {
+        return (
+          this._ == null
+          ? this
+          : (
+            f.length
+            ? f.reduceRight(({_, $}, c) => c(_, $), this)
+            : _.id_(this._, this.$)
+          )
+        );
       }
     },
     use: {
       configurable: true,
-      value (f, ...v) {
-        return this.fork.endo(f, ...v).base;
+      value (...f) {
+        return this.fork.endo(...f).base;
       }
     },
     affix: {
       configurable: true,
-      value (f) {
-        return this.fork.lift(f);
+      value (...f) {
+        return this.fork.lift(...f);
       }
     },
     annex: {
       configurable: true,
-      value (f) {
-        return this.fork.flat(f);
+      value (...f) {
+        return this.fork.flat(...f);
       }
     },
     is: {
       configurable: true,
       get () {
-        return this.endo(t => t.constructor);
+        return this.to(t => t.constructor);
       }
     },
     reduce: {
@@ -95,8 +109,28 @@
       value (f, p) {
         return this.lift(
           t => t.is._ === Array
-          ? t.endo(t => t.reduce(f, p))
-          : t.sets.endo(t => t.reduce((p, [k, w]) => f(p, k, w), p))
+          ? t.to(t => t.reduce(f, p))
+          : t.sets.to(t => t.reduce((p, [k, w]) => f(p, k, w), p))
+        );
+      }
+    },
+    foldL: {
+      configurable: true,
+      value (f, p) {
+        return this.lift(
+          t => t.is._ === Array
+          ? t.to(t => t.reduce(f, p))
+          : t.sets.to(t => t.reduce((p, [k, w]) => f(p, k, w), p))
+        );
+      }
+    },
+    foldR: {
+      configurable: true,
+      value (f, p) {
+        return this.lift(
+          t => t.is._ === Array
+          ? t.to(t => t.reduceRight(f, p))
+          : t.sets.to(t => t.reduceRight((p, [k, w]) => f(p, k, w), p))
         );
       }
     },
@@ -105,7 +139,7 @@
       value (f) {
         return this.lift(
           t => t.is._ === Array
-          ? t.endo(t => t.map(f))
+          ? t.to(t => t.map(f))
           : t.fold((p, k, w) => p.put({[k]: f(k, w)}), t.other)._
         );
       }
@@ -116,7 +150,7 @@
         return this.lift(
           t => t.is._ === Array
           ? t.use(t => t.forEach(f))
-          : t.fork.sets.endo(t => t.forEach(([k, v]) => f(k, v))).base
+          : t.fork.sets.to(t => t.forEach(([k, v]) => f(k, v))).base
         );
       }
     },
@@ -125,7 +159,7 @@
       value (f) {
         return this.lift(
           t => t.is._ === Array
-          ? t.endo(t => t.filter(f))
+          ? t.to(t => t.filter(f))
           : t.fold((p, k, v) => f(k, v) ? p.put({[k]: v}) : p, t.other)._
         );
       }
@@ -169,13 +203,13 @@
     popL: {
       configurable: true,
       get () {
-        return this.endo(a => a.shift());
+        return this.to(a => a.shift());
       }
     },
     popR: {
       configurable: true,
       get () {
-        return this.endo(a => a.pop());
+        return this.to(a => a.pop());
       }
     },
     toggle: {
@@ -193,7 +227,7 @@
     by: {
       configurable: true,
       get () {
-        return this.endo(
+        return this.to(
           t => t.prototype ? t.prototype : Object.getPrototypeOf(t)
         );
       }
@@ -201,49 +235,49 @@
     keys: {
       configurable: true,
       get () {
-        return this.endo(Object.keys);
+        return this.to(Object.keys);
       }
     },
     vals: {
       configurable: true,
       get () {
-        return this.endo(Object.values);
+        return this.to(Object.values);
       }
     },
     sets: {
       configurable: true,
       get () {
-        return this.endo(Object.entries);
+        return this.to(Object.entries);
       }
     },
     put: {
       configurable: true,
       value (...o) {
-        return this.endo(Object.assign, ...o);
+        return this.to(Object.assign, ...o);
       }
     },
     descript: {
       configurable: true,
       get () {
-        return this.endo(Object.getOwnPropertyDescriptors);
+        return this.to(Object.getOwnPropertyDescriptors);
       }
     },
     struct: {
       configurable: true,
       value (o) {
-        return this.endo(Object.create, o);
+        return this.to(Object.create, o);
       }
     },
     define: {
       configurable: true,
       value (o) {
-        return this.endo(Object.defineProperties, o);
+        return this.to(Object.defineProperties, o);
       }
     },
     make: {
       configurable: true,
       value (...o) {
-        return this.endo(Object.create, ...o);
+        return this.to(Object.create, ...o);
       }
     },
     create: {
@@ -255,7 +289,7 @@
     other: {
       configurable: true,
       get () {
-        return this.by.endo(Object.create);
+        return this.by.to(Object.create);
       }
     },
     copy: {
@@ -268,7 +302,7 @@
       configurable: true,
       get () {
         return this.lift(
-          t => t.sets.endo(a => a.reduce((p, [k, v]) => p.put({
+          t => t.sets.to(a => a.reduce((p, [k, v]) => p.put({
             [k]: (
               v instanceof Object
               ? _(v).clone._
@@ -281,7 +315,7 @@
     get: {
       configurable: true,
       value (...h) {
-        return this.lift(t => h.reduce((p, k) => p.endo(o => o[k]), t));
+        return this.lift(t => h.reduce((p, k) => p.to(o => o[k]), t));
       }
     },
     set: {
@@ -320,7 +354,7 @@
         return this.lift(
           t => t._.length == null
           ? t.put({length: t.keys._.length}).list
-          : t.endo(Array.from)
+          : t.to(Array.from)
         );
       }
     },
@@ -329,8 +363,8 @@
       get () {
         return this.lift(
           t => t.is._ === String
-          ? t.endo(s => {try {return JSON.parse(s)} catch (e) {return s}})
-          : t.endo(JSON.stringify)
+          ? t.to(s => {try {return JSON.parse(s)} catch (e) {return s}})
+          : t.to(JSON.stringify)
         );
       }
     },
@@ -339,7 +373,7 @@
       value (...v) {
         return this.lift(
           t => t.$ == null
-          ? t.fork.endo(f => f(...v))
+          ? t.fork.to(f => f(...v))
           : t
         );
       }
@@ -347,7 +381,7 @@
     redo: {
       configurable: true,
       value (...v) {
-        return this.lift(t => t.base.fork.endo(f => f(...v)));
+        return this.lift(t => t.base.fork.to(f => f(...v)));
       }
     },
     part: {
@@ -355,7 +389,7 @@
       value (...v) {
         return this.lift(
           t => _.fullen_(v)
-          ? t.endo(f => f(...v))
+          ? t.to(f => f(...v))
           : (...w) => t.lift(t => t.part(..._(v).adapt(...w)._))
         );
       }
@@ -368,9 +402,9 @@
     Object.values(a).includes(undefined) || Object.values(a).includes(null)
   );
 
-  _(this).endo(
+  _(this).to(
     t => _.is_(t) === Object
-    ? module.exports = _(_).fork.endo(_ => _.prototype).define({
+    ? module.exports = _(_).fork.to(_ => _.prototype).define({
       on: {
         configurable: true,
         value (o) {
